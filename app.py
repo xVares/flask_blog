@@ -1,8 +1,6 @@
 from flask import *
 import json
 
-# Flask, render_template, request, redirect, url_for
-
 BLOG_DATA_PATH = "data/blog_data.json"
 
 
@@ -52,12 +50,27 @@ def add():
             "title": title,
             "content": content
         }
-        print(blog_posts)
+
         blog_posts.append(new_blog_post)
         modify_json(BLOG_DATA_PATH, blog_posts)
 
         return redirect(url_for("index"))
     return render_template('add.html')
+
+
+@app.route('/delete/<int:post_id>')
+def delete(post_id):
+    """
+    Deletes post from database and redirects user back to index.
+    Deletion is immediately apparent.
+    """
+    blog_posts = parse_json(BLOG_DATA_PATH)
+
+    for post in blog_posts:
+        if post["id"] == post_id:
+            blog_posts.remove(post)
+            modify_json(BLOG_DATA_PATH, blog_posts)
+            return redirect(url_for("index"))
 
 
 if __name__ == "__main__":
