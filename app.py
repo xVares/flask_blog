@@ -1,6 +1,8 @@
-from flask import *
+from flask import Flask, request, render_template, redirect, url_for
 import json
+import uuid
 
+app = Flask(__name__)
 BLOG_DATA_PATH = "data/blog_data.json"
 
 
@@ -32,7 +34,6 @@ def modify_json(file_path, data):
 
 
 # Routes
-app = Flask(__name__)
 
 
 @app.route("/")
@@ -45,14 +46,14 @@ def index():
 @app.route("/add", methods=["GET", "POST"])
 def add():
     """
-    Route [/add] to add a new blog post.
+    Route [/add] to add a new blog post with a UUID.
     Behaviour of route changes depending on request method:
 
     GET:
         - Initial response: Render add.html -> user can add new post
 
     POST:
-        - After submitting form: Post added to database -> user redirected to root
+        - Submitting form: Post added to database -> user redirected to root [/]
     """
 
     if request.method == 'POST':
@@ -62,7 +63,7 @@ def add():
         content = request.form.get("content")
 
         new_post = {
-            "id": len(blog_posts) + 1,
+            "id": str(uuid.uuid4()),
             "author": author,
             "title": title,
             "content": content
@@ -75,7 +76,7 @@ def add():
     return render_template('add.html')
 
 
-@app.route('/delete/<int:post_id>')
+@app.route('/delete/<post_id>')
 def delete(post_id):
     """
     Deletes post from database and redirects user back to homepage [/].
@@ -90,7 +91,7 @@ def delete(post_id):
             return redirect(url_for("index"))
 
 
-@app.route('/update/<int:post_id>', methods=['GET', 'POST'])
+@app.route('/update/<post_id>', methods=['GET', 'POST'])
 def update(post_id):
     """
     Route [/update<int:post_id>] to update a blog post.
@@ -109,8 +110,8 @@ def update(post_id):
         # Post not found
         return "Post not found", 404
 
+    # Update the post in the JSON file if POST request
     if request.method == 'POST':
-        # Update the post in the JSON file
         author = request.form.get("author")
         title = request.form.get("title")
         content = request.form.get("content")
@@ -135,4 +136,4 @@ def update(post_id):
 
 # Main execution
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0', port=5000)

@@ -1,14 +1,1 @@
-[
-    {
-        "id": 1,
-        "author": "John Doe",
-        "title": "First Post",
-        "content": "This is my first post."
-    },
-    {
-        "id": 2,
-        "author": "Jane Doe",
-        "title": "Second Post",
-        "content": "This is another post."
-    }
-]
+[{"id": "fd0cbd16-15a8-4135-9ff3-729e55fcb565", "author": "John Doe", "title": "First Post", "content": "This is my first post."}, {"id": "20e44a92-21b6-4c30-9660-ff0f8d99bdab", "author": "Jane Doe", "title": "Second Post", "content": "This is another post."}]
