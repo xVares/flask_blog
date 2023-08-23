@@ -4,22 +4,34 @@ import json
 BLOG_DATA_PATH = "data/blog_data.json"
 
 
-def parse_json(data):
-    """
-    Parse JSON file in to Python object.
-    """
-    with open(data, "r") as f:
+# Helper Functions
+def parse_json(file_path):
+    """Parse JSON file to a Python object."""
+    with open(file_path, "r") as f:
         return json.load(f)
 
 
+def fetch_post_by_id(post_id):
+    """
+    Takes a post ID as arg and Iterates over all blog posts until:
+        - No matching post is found -> returns None
+        - A matching post is found -> returns that post & its index
+    """
+    blog_posts = parse_json(BLOG_DATA_PATH)
+
+    for post in blog_posts:
+        if post['id'] == post_id:
+            return post, blog_posts.index(post)
+    return None
+
+
 def modify_json(file_path, data):
-    """
-    Save modified data to file.
-    """
+    """Save modified data to JSON file."""
     with open(file_path, "w") as f:
         json.dump(data, f)
 
 
+# Routes
 app = Flask(__name__)
 
 
@@ -33,25 +45,30 @@ def index():
 @app.route("/add", methods=["GET", "POST"])
 def add():
     """
-    Shows form when website is reached via GET request to add new blog posts
-    After filling out form and submitting:
-        - new blog post will be added to database
-        - user will be redirected to homepage to see the new added post
+    Route [/add] to add a new blog post.
+    Behaviour of route changes depending on request method:
+
+    GET:
+        - Initial response: Render add.html -> user can add new post
+
+    POST:
+        - After submitting form: Post added to database -> user redirected to root
     """
+
     if request.method == 'POST':
+        blog_posts = parse_json(BLOG_DATA_PATH)
         author = request.form.get("author")
         title = request.form.get("title")
         content = request.form.get("content")
-        blog_posts = parse_json(BLOG_DATA_PATH)
 
-        new_blog_post = {
+        new_post = {
             "id": len(blog_posts) + 1,
             "author": author,
             "title": title,
             "content": content
         }
 
-        blog_posts.append(new_blog_post)
+        blog_posts.append(new_post)
         modify_json(BLOG_DATA_PATH, blog_posts)
 
         return redirect(url_for("index"))
@@ -61,7 +78,7 @@ def add():
 @app.route('/delete/<int:post_id>')
 def delete(post_id):
     """
-    Deletes post from database and redirects user back to index.
+    Deletes post from database and redirects user back to homepage [/].
     Deletion is immediately apparent.
     """
     blog_posts = parse_json(BLOG_DATA_PATH)
@@ -73,5 +90,49 @@ def delete(post_id):
             return redirect(url_for("index"))
 
 
+@app.route('/update/<int:post_id>', methods=['GET', 'POST'])
+def update(post_id):
+    """
+    Route [/update<int:post_id>] to update a blog post.
+    Behaviour of route changes depending on request method:
+
+    GET:
+        - Initial response: Render update.html -> user can update specified post
+
+    POST:
+        - After submitting form: Post gets updated -> user redirected to root
+    """
+    blog_posts = parse_json(BLOG_DATA_PATH)
+    specified_post, post_index = fetch_post_by_id(post_id)
+
+    if specified_post is None:
+        # Post not found
+        return "Post not found", 404
+
+    if request.method == 'POST':
+        # Update the post in the JSON file
+        author = request.form.get("author")
+        title = request.form.get("title")
+        content = request.form.get("content")
+
+        new_post = {
+            "id": post_id,
+            "author": author,
+            "title": title,
+            "content": content
+        }
+
+        blog_posts[post_index] = new_post
+        modify_json(BLOG_DATA_PATH, blog_posts)
+
+        # Redirect back to index
+        return redirect(url_for("index"))
+
+    # Else, it's a GET request
+    # Thus displays update.html page
+    return render_template('update.html', post=specified_post)
+
+
+# Main execution
 if __name__ == "__main__":
     app.run()

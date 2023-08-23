@@ -24,17 +24,24 @@ h1 {
     top: -15px;
 }
 
-.delete-post {
-    background-color: #c00000f5;
+.buttons * {
     color: white;
     text-decoration: none;
     padding: 5px 10px;
-    border: 2px, solid #c00000f5;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
     position: relative;
     top: 8px;
+}
+
+.delete-post {
+    background-color: #c00000f5;
+    border: 2px, solid #c00000f5;
+}
+.update-post {
+    background-color: #08af69;
+    border: 2px, solid #08af69;
 }
 
 .post {

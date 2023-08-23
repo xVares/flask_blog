@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <title>Add Blog Post</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style_form.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_add.css') }}">
 </head>
 
 <body>
@@ -11,6 +11,7 @@
     <h1>Add Blog Post</h1>
 
     <form action="/add" method="post">
+
         <!-- Label and Input for Author -->
         <label for="author">Author:</label>
         <input type="text" id="author" name="author" required>
